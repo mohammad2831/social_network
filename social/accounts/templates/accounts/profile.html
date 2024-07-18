@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2 style="color: black; text-align: center; ">Welcome {{ user.username }}</h2>
+<div style="height: 570px; width: 1800px;">
+
+    <div
+        style="height: 99%; width: 49.7%; border: 3px black solid;display: inline-block; float: left; border-radius: 20px;">
+        <h4>. Create new Post :</h4>
+        <div style="margin-left: 70px;">
+            <form action="{% url 'accounts:user_profile' request.user.username %}" method="post"
+                enctype="multipart/form-data" novalidate class="col-md-5">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <input type="submit" value="submit">
+            </form>
+        </div>
+    </div>
+    <div
+        style="height: 99%; width: 49%; border: 3px black solid;display: inline-block; float: right;border-radius: 20px; ">
+        <h4>. your activity :</h4>
+        <div style="height: 90%; width: 95%;margin-left: auto; margin-right: auto;">
+            <table class="table table-dark">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Post</th>
+                        <th scope="col">Created</th>
+                        <th scope="col">Publish</th>
+                        <th scope="col">Like</th>
+                        <th scope="col">Dislike</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for post in posts %}
+                    <tr>
+                        <th scope="row">{{ forloop.counter0 }}</th>
+                        <td>{{ post.slug }}</td>
+                        <td>{{ post.created }}</td>
+                        <td>{{ post.published }}</td>
+                        <td>{{ post.like_count }}</td>
+                        <td>{{ post.dislike_count }}</td>
+                    </tr>
+                    {% endfor %}
+
+                </tbody>
+            </table>
+        </div>
+
+
+    </div>
+
+</div>
+
+
+{% endblock %}
