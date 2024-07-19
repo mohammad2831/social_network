@@ -8,6 +8,7 @@ from . models import User, Post, Comment, Vote
 from django.contrib import messages
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.paginator import Paginator
 
 class UserRegisterView(View):
     def dispatch(self, request, *args, **kwargs):
@@ -64,21 +65,25 @@ class UserLoginView(View):
         return render(request, 'accounts/login.html', {'form': form})
     
 
+
 class CreatePostView(LoginRequiredMixin, View):
     form_class = PostForm
 
     def get(self, request, username):
         user = get_object_or_404(User, username=username)
-        posts = Post.objects.filter(user=user)
+        post_list = Post.objects.filter(user=user)
+        paginator = Paginator(post_list, 2)  
+        page = request.GET.get('page', 1)
+        posts = paginator.get_page(page)
 
         form = self.form_class()
-        return render(request, 'accounts/profile.html', {'user':user ,'form': form, 'posts':posts})
+        return render(request, 'accounts/profile.html', {'user': user, 'form': form, 'posts': posts})
 
     def post(self, request, username):
         user = get_object_or_404(User, username=username)
         form = self.form_class(request.POST, request.FILES)
         if form.is_valid():
-            Post.objects.create_post(
+            Post.objects.create(
                 user=request.user,
                 title=form.cleaned_data['title'],
                 image=form.cleaned_data['image'],
@@ -86,7 +91,7 @@ class CreatePostView(LoginRequiredMixin, View):
                 slug=form.cleaned_data['slug']
             )
             return redirect('accounts:user_profile', username=user.username)
-        return render(request, 'accounts/profile.html', {'form': form, 'user':user})
+        return render(request, 'accounts/profile.html', {'form': form, 'user': user})
     
 
 
